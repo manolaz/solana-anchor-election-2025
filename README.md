@@ -2,7 +2,7 @@
 
 ## 🆕 Updated for Solana Kit, Kite, and Codama
 
-[![CI Badge](https://github.com/solana-kite/anchor-election-2025/actions/workflows/tests.yaml/badge.svg)](https://github.com/solana-kite/anchor-election-2025/actions)
+[![CI Badge](https://github.com/solanakite/anchor-election-2025/actions/workflows/tests.yaml/badge.svg)](https://github.com/solanakite/anchor-election-2025/actions)
 
 A new version of [onchain voting from the Anchor docs](https://examples.anchor-lang.com/docs/onchain-voting). 
 
