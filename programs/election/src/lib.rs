@@ -1,4 +1,10 @@
 use anchor_lang::prelude::*;
+use handlers::*;
+
+pub mod constants;
+pub mod error;
+pub mod handlers;
+pub mod state;
 
 declare_id!("9rHqnJtY6QGbyAdMjtzVaHKix5tAgbQTRpasW6iz2FZd");
 
@@ -6,13 +12,16 @@ declare_id!("9rHqnJtY6QGbyAdMjtzVaHKix5tAgbQTRpasW6iz2FZd");
 pub mod election {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        msg!("Greetings from: {:?}", ctx.program_id);
-        Ok(())
+    pub fn create_election(
+        context: Context<CreateElectionAccounts>
+    ) -> Result<()> {
+        handlers::create_election::create_election(context)
+    }
+
+    pub fn vote(
+        context: Context<VoteAccounts>, 
+        choice: state::Choice
+    ) -> Result<()> {
+        handlers::vote::vote(context, choice)
     }
 }
-
-#[derive(Accounts)]
-pub struct Initialize {}
-
-
