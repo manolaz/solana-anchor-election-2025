@@ -17,14 +17,18 @@ describe("election", () => {
   // Configure the client to use the local cluster.
   let connection: Connection;
   let user: KeyPairSigner;
-  let election: KeyPairSigner;
+  let election: Address;
   let getElections: () => Promise<Array<MaybeAccount<programClient.Election, string>>>
 
   before(async () => {
     connection = await connect();
     user = await connection.createWallet();
-    election = await connection.createWallet();
 
+    // Create an address for "election"
+    const electionPDAAndBump = await connection.getPDAAndBump(programClient.ELECTION_PROGRAM_ADDRESS, ["election"]);
+    election = electionPDAAndBump.pda;
+
+    // Create a function to get all elections.
     getElections = connection.getAccountsFactory(
       programClient.ELECTION_PROGRAM_ADDRESS,
       ELECTION_DISCRIMINATOR,
@@ -50,7 +54,7 @@ describe("election", () => {
 
   it("Votes for GM", async () => { 
     const voteInstruction = await programClient.getVoteInstruction({
-      election: election.address,
+      election: election,
       signer: user,
       choice: programClient.Choice.GM,
     })
@@ -75,7 +79,7 @@ describe("election", () => {
 
   it("Votes for GN", async () => { 
     const voteInstruction = await programClient.getVoteInstruction({
-      election: election.address,
+      election: election,
       signer: user,
       choice: programClient.Choice.GN,
     })

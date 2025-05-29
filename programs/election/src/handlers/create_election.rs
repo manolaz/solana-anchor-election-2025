@@ -8,6 +8,8 @@ pub struct CreateElectionAccounts<'info> {
         init, 
         payer = signer, 
         space = Election::DISCRIMINATOR.len() + Election::INIT_SPACE, 
+        seeds = [b"election"],
+        bump,
     )] 
     pub election: Account<'info, Election>,
 

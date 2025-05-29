@@ -3,7 +3,11 @@ use crate::state::*;
 
 #[derive(Accounts)]
 pub struct VoteAccounts<'info> {
-    #[account(mut)] 
+    #[account(
+        mut, 
+        seeds = [b"election"], 
+        bump,
+    )] 
     pub election: Account<'info, Election>,
 
     pub signer: Signer<'info>,
