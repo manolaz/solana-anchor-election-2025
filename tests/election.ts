@@ -52,7 +52,7 @@ describe("election", () => {
   });
 
 
-  it("Votes for GM", async () => { 
+  it("Votes for GM", async () => {
     const voteInstruction = await programClient.getVoteInstruction({
       election: election,
       signer: user,
@@ -75,9 +75,12 @@ describe("election", () => {
     assert(firstElectionData.isOpen, "Election should be open");
     assert.equal(firstElectionData.gm, 1, "GM should be 1");
     assert.equal(firstElectionData.gn, 0, "GN should be 0");
+
+    const logs = await connection.getLogs(signature);
+    assert(logs.includes("Program log: Voted for GM ☀️"), "Should include the log message");
   });
 
-  it("Votes for GN", async () => { 
+  it("Votes for GN", async () => {
     const voteInstruction = await programClient.getVoteInstruction({
       election: election,
       signer: user,
@@ -94,6 +97,7 @@ describe("election", () => {
     const elections = await getElections();
 
     assert.ok(elections.length === 1, "Expected to get one election");
+
     // @ts-expect-error the 'data' property does actually exist.
     // TODO: resolve this error.
     const firstElectionData = elections[0].data;
@@ -101,5 +105,10 @@ describe("election", () => {
     assert(firstElectionData.isOpen, "Election should be open");
     assert.equal(firstElectionData.gm, 1, "GM should be 1");
     assert.equal(firstElectionData.gn, 1, "GN should be 1");
+
+    const logs = await connection.getLogs(signature);
+    assert(logs.includes("Program log: Voted for GN 🌌"), "Should include the log message");
+
+
   });
 });
