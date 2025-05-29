@@ -4,7 +4,6 @@ import * as programClient from "../dist/js-client";
 import { getElectionDecoder, ELECTION_DISCRIMINATOR } from "../dist/js-client";
 import { connect, Connection, TOKEN_EXTENSIONS_PROGRAM, ErrorWithTransaction } from "solana-kite";
 import { type KeyPairSigner, type Address, MaybeAccount, MaybeEncodedAccount, parseBase64RpcAccount, decodeAccount, type Base58EncodedBytes } from "@solana/kit";
-import bs58 from "bs58";
 
 export const log = console.log;
 export const stringify = (object: any) => {
