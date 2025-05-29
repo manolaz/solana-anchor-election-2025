@@ -8,7 +8,7 @@ A new version of [onchain voting from the Anchor docs](https://examples.anchor-l
 
 > A decentralized onchain voting system on Solana, where users can vote on their favourite greeting
 
-Note that like [the original](https://github.com/coral-xyz/anchor-by-example/blob/master/programs/onchain-voting/programs/onchain-voting/src/lib.rs), we do allow multiple votes!
+Unlike [the original](https://github.com/coral-xyz/anchor-by-example/blob/master/programs/onchain-voting/programs/onchain-voting), we don't the same account to vote multiple times!
 
 This repo provides:
 

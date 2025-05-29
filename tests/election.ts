@@ -16,13 +16,14 @@ export const stringify = (object: any) => {
 describe("election", () => {
   // Configure the client to use the local cluster.
   let connection: Connection;
-  let user: KeyPairSigner;
+  let alice: KeyPairSigner;
+  let bob: KeyPairSigner;
   let election: Address;
   let getElections: () => Promise<Array<MaybeAccount<programClient.Election, string>>>
 
   before(async () => {
     connection = await connect();
-    user = await connection.createWallet();
+    [alice, bob] = await connection.createWallets(2, {});
 
     // Create an address for "election"
     const electionPDAAndBump = await connection.getPDAAndBump(programClient.ELECTION_PROGRAM_ADDRESS, ["election"]);
@@ -36,15 +37,15 @@ describe("election", () => {
     );
   });
 
-  it("Creates an election for the public to vote on", async () => {
+  test("Alice creates an election for the public to vote on", async () => {
     // Create an instruction that calls the create_election() instruction handler
     const createElectionInstruction = await programClient.getCreateElectionInstruction({
       election: election,
-      signer: user,
+      signer: alice,
     })
 
     const signature = await connection.sendTransactionFromInstructions({
-      feePayer: user,
+      feePayer: alice,
       instructions: [createElectionInstruction],
     });
 
@@ -52,15 +53,21 @@ describe("election", () => {
   });
 
 
-  it("Votes for GM", async () => {
+  test("Alice votes for GM", async () => {
+
+    // Create a PDA for Alice's vote account
+    const votePDAAndBump = await connection.getPDAAndBump(programClient.ELECTION_PROGRAM_ADDRESS, ["vote", alice.address]);
+    const vote = votePDAAndBump.pda;
+
     const voteInstruction = await programClient.getVoteInstruction({
-      election: election,
-      signer: user,
+      election,
+      vote,
+      signer: alice,
       choice: programClient.Choice.GM,
     })
 
     const signature = await connection.sendTransactionFromInstructions({
-      feePayer: user,
+      feePayer: alice,
       instructions: [voteInstruction],
     });
 
@@ -80,15 +87,21 @@ describe("election", () => {
     assert(logs.includes("Program log: Voted for GM ☀️"), "Should include the log message");
   });
 
-  it("Votes for GN", async () => {
+  test("Bob votes for GN", async () => {
+
+    // Create a PDA for the vote
+    const votePDAAndBump = await connection.getPDAAndBump(programClient.ELECTION_PROGRAM_ADDRESS, ["vote", bob.address]);
+    const vote = votePDAAndBump.pda;
+
     const voteInstruction = await programClient.getVoteInstruction({
       election: election,
-      signer: user,
+      vote: vote,
+      signer: bob,
       choice: programClient.Choice.GN,
     })
 
     const signature = await connection.sendTransactionFromInstructions({
-      feePayer: user,
+      feePayer: bob,
       instructions: [voteInstruction],
     });
 
@@ -110,5 +123,29 @@ describe("election", () => {
     assert(logs.includes("Program log: Voted for GN 🌌"), "Should include the log message");
 
 
+  });
+
+  test("Alice cannot vote twice", async () => {
+    // Create a PDA for Alice's vote account (same as before)
+    const votePDAAndBump = await connection.getPDAAndBump(programClient.ELECTION_PROGRAM_ADDRESS, ["vote", alice.address]);
+    const vote = votePDAAndBump.pda;
+
+    const voteInstruction = await programClient.getVoteInstruction({
+      election,
+      vote,
+      signer: alice,
+      choice: programClient.Choice.GM,
+    });
+
+    try {
+      await connection.sendTransactionFromInstructions({
+        feePayer: alice,
+        instructions: [voteInstruction],
+      });
+      assert.fail("Expected transaction to fail");
+    } catch (thrownObject) {
+      const error = thrownObject as Error;
+      assert.ok(error.message.includes("account already in use"), "Error should indicate account already in use due to seeds constraint");
+    }
   });
 });
