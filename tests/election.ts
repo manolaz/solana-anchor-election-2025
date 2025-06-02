@@ -2,8 +2,8 @@ import { before, describe, test, it } from "node:test";
 import assert from "node:assert";
 import * as programClient from "../dist/js-client";
 import { getElectionDecoder, ELECTION_DISCRIMINATOR } from "../dist/js-client";
-import { connect, Connection, TOKEN_EXTENSIONS_PROGRAM, ErrorWithTransaction } from "solana-kite";
-import { type KeyPairSigner, type Address, MaybeAccount, MaybeEncodedAccount, parseBase64RpcAccount, decodeAccount, type Base58EncodedBytes } from "@solana/kit";
+import { connect, Connection } from "solana-kite";
+import { type KeyPairSigner, type Address, MaybeAccount } from "@solana/kit";
 
 export const log = console.log;
 export const stringify = (object: any) => {
@@ -22,7 +22,7 @@ describe("election", () => {
 
   before(async () => {
     connection = await connect();
-    [alice, bob] = await connection.createWallets(2, {});
+    [alice, bob] = await connection.createWallets(2);
 
     // Create an address for "election"
     const electionPDAAndBump = await connection.getPDAAndBump(programClient.ELECTION_PROGRAM_ADDRESS, ["election"]);
