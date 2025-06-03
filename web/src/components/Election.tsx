@@ -5,7 +5,7 @@ import {
 } from "@solana/kit";
 import { useWalletAccountTransactionSendingSigner } from "@solana/react";
 import { type UiWalletAccount } from "@wallet-standard/react";
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { useSWRConfig } from "swr";
 import * as programClient from "../../../dist/js-client";
 import { getElectionDecoder, ELECTION_DISCRIMINATOR } from "../../../dist/js-client";
@@ -54,6 +54,11 @@ export function Election({ account }: Props) {
       setError(error);
     }
   };
+
+  // Fetch elections when the component mounts
+  useEffect(() => {
+    void fetchElections();
+  }, []);
 
   const createElection = async () => {
     try {
@@ -132,15 +137,54 @@ export function Election({ account }: Props) {
       ) : (
         <div>
           <h4>Found {elections.length} elections:</h4>
-          {elections.map((election, index) => (
-            <div key={index} style={{ marginTop: '8px' }}>
-              <pre>{stringify(election)}</pre>
-              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                <button onClick={() => vote(programClient.Choice.GM)}>Vote GM ☀️</button>
-                <button onClick={() => vote(programClient.Choice.GN)}>Vote GN 🌌</button>
+          {elections.map((election, index) => {
+            // @ts-expect-error the 'data' property does actually exist
+            const electionData = election.data;
+            const totalVotes = BigInt(electionData.gm) + BigInt(electionData.gn);
+            const gmPercentage = totalVotes === 0n ? 50 : Number(BigInt(electionData.gm) * 100n / totalVotes);
+            const gnPercentage = totalVotes === 0n ? 50 : Number(BigInt(electionData.gn) * 100n / totalVotes);
+
+            return (
+              <div key={index} style={{ marginTop: '8px' }}>
+                <div style={{ marginBottom: '8px' }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginBottom: '4px',
+                    fontSize: '32px',
+                    fontWeight: 'bold'
+                  }}>
+                    <span>Votes for GM ☀️: {electionData.gm.toString()}</span>
+                    <span>Votes for GN 🌌: {electionData.gn.toString()}</span>
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    height: '4px',
+                    borderRadius: '2px',
+                    overflow: 'hidden',
+                    border: '1px solid #ccc',
+                    marginBottom: '8px'
+                  }}>
+                    <div style={{
+                      width: `${gmPercentage}%`,
+                      backgroundColor: '#ffd700',
+                      transition: 'width 0.3s ease'
+                    }} />
+                    <div style={{
+                      width: `${gnPercentage}%`,
+                      backgroundColor: '#1a237e',
+                      transition: 'width 0.3s ease'
+                    }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => vote(programClient.Choice.GM)}>Vote GM ☀️</button>
+                    <button onClick={() => vote(programClient.Choice.GN)}>Vote GN 🌌</button>
+                  </div>
+                </div>
+                <pre>{stringify(election)}</pre>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
