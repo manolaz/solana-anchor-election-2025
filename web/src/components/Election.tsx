@@ -84,6 +84,41 @@ export function Election({ account }: Props) {
     }
   };
 
+  const vote = async (choice: programClient.Choice) => {
+    try {
+      // Get the PDA for the election account
+      const electionPDAAndBump = await connection.getPDAAndBump(ELECTION_PROGRAM_ADDRESS, ["election"]);
+      const election = electionPDAAndBump.pda;
+
+      // Create a PDA for the vote account
+      const votePDAAndBump = await connection.getPDAAndBump(ELECTION_PROGRAM_ADDRESS, ["vote", account.address]);
+      const vote = votePDAAndBump.pda;
+
+      // Create the vote instruction
+      const voteInstruction = await programClient.getVoteInstruction({
+        election,
+        vote,
+        signer: transactionSendingSigner as unknown as KeyPairSigner,
+        choice,
+      });
+
+      // Send the transaction
+      const signature = await connection.sendTransactionFromInstructionsWithWalletApp({
+        feePayer: transactionSendingSigner,
+        instructions: [voteInstruction],
+      });
+
+      console.log("Voted with signature:", signature);
+
+      // Refresh the elections list
+      const results = await getElections();
+      setElections(results);
+    } catch (error) {
+      console.error("Error voting:", error);
+      setError(error);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <h3 style={{ margin: 0 }}>Elections</h3>
@@ -100,6 +135,10 @@ export function Election({ account }: Props) {
           {elections.map((election, index) => (
             <div key={index} style={{ marginTop: '8px' }}>
               <pre>{stringify(election)}</pre>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <button onClick={() => vote(programClient.Choice.GM)}>Vote GM ☀️</button>
+                <button onClick={() => vote(programClient.Choice.GN)}>Vote GN 🌌</button>
+              </div>
             </div>
           ))}
         </div>
