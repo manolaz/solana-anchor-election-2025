@@ -16,6 +16,15 @@ type Props = Readonly<{
   account: UiWalletAccount;
 }>;
 
+const log = console.log;
+const bigIntReplacer = (key: string, value: any) => {
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+  return value;
+};
+const stringify = (value: any) => JSON.stringify(value, bigIntReplacer, 2);
+
 const ELECTION_PROGRAM_ADDRESS = address("9rHqnJtY6QGbyAdMjtzVaHKix5tAgbQTRpasW6iz2FZd");
 
 export function Election({ account }: Props) {
@@ -33,6 +42,18 @@ export function Election({ account }: Props) {
     ELECTION_DISCRIMINATOR,
     getElectionDecoder(),
   );
+
+  const fetchElections = async () => {
+    try {
+      const results = await getElections();
+      console.log(`Address: ${ELECTION_PROGRAM_ADDRESS}`);
+      setElections(results);
+      console.log("Elections:", results);
+    } catch (error) {
+      console.error("Error fetching elections:", error);
+      setError(error);
+    }
+  };
 
   const createElection = async () => {
     try {
@@ -67,17 +88,7 @@ export function Election({ account }: Props) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <h3 style={{ margin: 0 }}>Elections</h3>
       <div style={{ display: 'flex', gap: '8px' }}>
-        <button onClick={async () => {
-          try {
-            const results = await getElections();
-            console.log(`Address: ${ELECTION_PROGRAM_ADDRESS}`);
-            setElections(results);
-            console.log("Elections:", results);
-          } catch (error) {
-            console.error("Error fetching elections:", error);
-            setError(error);
-          }
-        }}>Get Elections</button>
+        <button onClick={fetchElections}>Get Elections</button>
         <button onClick={createElection}>Create Election</button>
       </div>
 
@@ -88,7 +99,7 @@ export function Election({ account }: Props) {
           <h4>Found {elections.length} elections:</h4>
           {elections.map((election, index) => (
             <div key={index} style={{ marginTop: '8px' }}>
-              <pre>{JSON.stringify(election, null, 2)}</pre>
+              <pre>{stringify(election)}</pre>
             </div>
           ))}
         </div>
