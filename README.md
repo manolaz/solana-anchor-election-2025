@@ -15,6 +15,9 @@ This repo provides:
 - Full compatibility with the latest Rust, Agave CLI, Node.js, Anchor, and Solana Kit.
 - Clean builds with zero warnings or errors.
 - Testing via npm and Node.js, avoiding third-party package managers or test runners.
+- [A web app using Solana Kit in the browser](web/README.md)
+
+![Solana Kit for an Anchor App Working in Browser](screenshot.png)
 
 ## Versions
 
