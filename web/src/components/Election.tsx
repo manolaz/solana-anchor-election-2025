@@ -1,12 +1,13 @@
 import {
   address,
   lamports,
+  type KeyPairSigner,
 } from "@solana/kit";
 import { useWalletAccountTransactionSendingSigner } from "@solana/react";
 import { type UiWalletAccount } from "@wallet-standard/react";
 import { useContext, useRef, useState } from "react";
 import { useSWRConfig } from "swr";
-// import * as programClient from "../../../dist/js-client";
+import * as programClient from "../../../dist/js-client";
 import { getElectionDecoder, ELECTION_DISCRIMINATOR } from "../../../dist/js-client";
 import { ChainContext } from "../context/ChainContext";
 import { ConnectionContext } from "../context/ConnectionContext";
@@ -33,20 +34,52 @@ export function Election({ account }: Props) {
     getElectionDecoder(),
   );
 
+  const createElection = async () => {
+    try {
+      // Get the PDA for the election account
+      const electionPDAAndBump = await connection.getPDAAndBump(ELECTION_PROGRAM_ADDRESS, ["election"]);
+      const election = electionPDAAndBump.pda;
+
+      // Create the instruction
+      const createElectionInstruction = await programClient.getCreateElectionInstruction({
+        election,
+        signer: transactionSendingSigner as unknown as KeyPairSigner,
+      });
+
+      // Send the transaction
+      const signature = await connection.sendTransactionFromInstructionsWithWalletApp({
+        feePayer: transactionSendingSigner,
+        instructions: [createElectionInstruction],
+      });
+
+      console.log("Created election with signature:", signature);
+
+      // Refresh the elections list
+      const results = await getElections();
+      setElections(results);
+    } catch (error) {
+      console.error("Error creating election:", error);
+      setError(error);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <h3 style={{ margin: 0 }}>Elections</h3>
-      <button onClick={async () => {
-        try {
-          const results = await getElections();
-          console.log(`Address: ${ELECTION_PROGRAM_ADDRESS}`);
-          setElections(results);
-          console.log("Elections:", results);
-        } catch (error) {
-          console.error("Error fetching elections:", error);
-          setError(error);
-        }
-      }}>Get Elections</button>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <button onClick={async () => {
+          try {
+            const results = await getElections();
+            console.log(`Address: ${ELECTION_PROGRAM_ADDRESS}`);
+            setElections(results);
+            console.log("Elections:", results);
+          } catch (error) {
+            console.error("Error fetching elections:", error);
+            setError(error);
+          }
+        }}>Get Elections</button>
+        <button onClick={createElection}>Create Election</button>
+      </div>
 
       {elections.length === 0 ? (
         <div>No elections yet, make one!</div>
