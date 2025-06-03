@@ -128,17 +128,15 @@ export function Election({ account }: Props) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <h3 style={{ margin: 0 }}>Elections</h3>
       <div style={{ display: 'flex', gap: '8px' }}>
-        <button onClick={fetchElections}>Get Elections</button>
-        <button onClick={createElection}>Create Election</button>
+        <button onClick={fetchElections}>{elections.length > 0 ? 'Update Election' : 'Get Election'}</button>
+        {elections.length === 0 && <button onClick={createElection}>Create Election</button>}
       </div>
 
       {elections.length === 0 ? (
         <div>No elections yet, make one!</div>
       ) : (
         <div>
-          <h4>Found {elections.length} elections:</h4>
           {elections.map((election, index) => {
-            // @ts-expect-error the 'data' property does actually exist
             const electionData = election.data;
             const totalVotes = BigInt(electionData.gm) + BigInt(electionData.gn);
             const gmPercentage = totalVotes === 0n ? 50 : Number(BigInt(electionData.gm) * 100n / totalVotes);
@@ -181,6 +179,7 @@ export function Election({ account }: Props) {
                     <button onClick={() => vote(programClient.Choice.GN)}>Vote GN 🌌</button>
                   </div>
                 </div>
+                <h4 style={{ marginTop: '24px' }}>Raw election account:</h4>
                 <pre>{stringify(election)}</pre>
               </div>
             );

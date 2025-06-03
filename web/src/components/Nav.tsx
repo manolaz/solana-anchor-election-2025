@@ -26,7 +26,7 @@ export function Nav() {
       <Flex gap="4" justify="between" align="center">
         <Box flexGrow="1">
           <Heading as="h1" size={{ initial: "4", xs: "6" }} truncate>
-            Solana React App{" "}
+            Solana Election App{" "}
             {setChain ? (
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger>{currentChainBadge}</DropdownMenu.Trigger>

@@ -5,9 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import { Balance } from "../components/Balance";
 import { FeatureNotSupportedCallout } from "../components/FeatureNotSupportedCallout";
-import { SignAndSendTransaction } from "../components/SignAndSendTransaction";
 import { Election } from "../components/Election";
-import { SignMessage } from "../components/SignMessage";
 import { WalletAccountIcon } from "../components/WalletAccountIcon";
 import { ChainContext } from "../context/ChainContext";
 import { SelectedWalletAccountContext } from "../context/SelectedWalletAccountContext";
@@ -46,16 +44,10 @@ function Root() {
               </ErrorBoundary>
             </Flex>
           </Flex>
-          <ErrorBoundary FallbackComponent={FeatureNotSupportedCallout} resetKeys={errorBoundaryResetKeys}>
-            <SignAndSendTransaction account={selectedWalletAccount} />
-          </ErrorBoundary>
-          <ErrorBoundary FallbackComponent={FeatureNotSupportedCallout} resetKeys={errorBoundaryResetKeys}>
-            <SignMessage account={selectedWalletAccount} />
-          </ErrorBoundary>
           <Election account={selectedWalletAccount} />
         </Flex>
       ) : (
-        <Text as="p">Click &ldquo;Connect Wallet&rdquo; to get started.</Text>
+        <Text as="p">Click &ldquo;Sign In&rdquo; to get started (or connect your wallet).</Text>
       )}
     </Container>
   );
