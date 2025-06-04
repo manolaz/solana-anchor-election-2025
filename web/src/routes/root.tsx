@@ -26,16 +26,13 @@ function Root() {
               <WalletAccountIcon account={selectedWalletAccount} height="48" width="48" />
               <Box>
                 <Heading as="h4" size="3">
-                  {selectedWalletAccount.label ?? "Unlabeled Account"}
+                  Connected to {selectedWalletAccount.address}
                 </Heading>
-                <Code variant="outline" truncate size={{ initial: "1", xs: "2" }}>
-                  {selectedWalletAccount.address}
-                </Code>
               </Box>
             </Flex>
             <Flex direction="column" align="end">
               <Heading as="h4" size="3">
-                Balance
+                SOL balance
               </Heading>
               <ErrorBoundary fallback={<Text>&ndash;</Text>} key={`${selectedWalletAccount.address}:${chain}`}>
                 <Suspense fallback={<Spinner loading my="1" />}>
