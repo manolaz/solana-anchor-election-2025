@@ -11,6 +11,7 @@ import * as programClient from "../../../dist/js-client";
 import { getElectionDecoder, ELECTION_DISCRIMINATOR } from "../../../dist/js-client";
 import { ChainContext } from "../context/ChainContext";
 import { ConnectionContext } from "../context/ConnectionContext";
+import { DayNightChart } from "./DayNightChart";
 
 type Props = Readonly<{
   account: UiWalletAccount;
@@ -138,42 +139,11 @@ export function Election({ account }: Props) {
         <div>
           {elections.map((election, index) => {
             const electionData = election.data;
-            const totalVotes = BigInt(electionData.gm) + BigInt(electionData.gn);
-            const gmPercentage = totalVotes === 0n ? 50 : Number(BigInt(electionData.gm) * 100n / totalVotes);
-            const gnPercentage = totalVotes === 0n ? 50 : Number(BigInt(electionData.gn) * 100n / totalVotes);
 
             return (
               <div key={index} style={{ marginTop: '8px' }}>
                 <div style={{ marginBottom: '8px' }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginBottom: '4px',
-                    fontSize: '32px',
-                    fontWeight: 'bold'
-                  }}>
-                    <span>Votes for GM ☀️: {electionData.gm.toString()}</span>
-                    <span>Votes for GN 🌌: {electionData.gn.toString()}</span>
-                  </div>
-                  <div style={{
-                    display: 'flex',
-                    height: '4px',
-                    borderRadius: '2px',
-                    overflow: 'hidden',
-                    border: '1px solid #ccc',
-                    marginBottom: '8px'
-                  }}>
-                    <div style={{
-                      width: `${gmPercentage}%`,
-                      backgroundColor: '#ffd700',
-                      transition: 'width 0.3s ease'
-                    }} />
-                    <div style={{
-                      width: `${gnPercentage}%`,
-                      backgroundColor: '#1a237e',
-                      transition: 'width 0.3s ease'
-                    }} />
-                  </div>
+                  <DayNightChart gmVotes={electionData.gm} gnVotes={electionData.gn} />
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={() => vote(programClient.Choice.GM)}>Vote GM ☀️</button>
                     <button onClick={() => vote(programClient.Choice.GN)}>Vote GN 🌌</button>
