@@ -1,4 +1,4 @@
-// From https://solana.stackexchange.com/questions/16703/can-anchor-client-be-used-with-solana-web3-js-2-0rc
+// Based on https://solana.stackexchange.com/questions/16703/can-anchor-client-be-used-with-solana-web3-js-2-0rc
 import { createFromRoot } from "codama";
 import { rootNodeFromAnchor } from "@codama/nodes-from-anchor";
 import { renderJavaScriptVisitor } from "@codama/renderers";
@@ -13,14 +13,16 @@ const loadAnchorIDL = async () => {
   try {
     // Read the directory contents
     const files = await fs.readdir(dirPath);
-    const jsonFiles = files.filter(file => file.endsWith('.json'));
+    const jsonFiles = files.filter((file) => file.endsWith(".json"));
 
-    if (jsonFiles.length === 0) {
+    if (!jsonFiles.length) {
       throw new Error(`No JSON files found in ${dirPath}`);
     }
 
     if (jsonFiles.length > 1) {
-      throw new Error(`Multiple JSON files found in ${dirPath}. Please specify which one to use.`);
+      throw new Error(
+        `Multiple JSON files found in ${dirPath}. Please specify which one to use.`
+      );
     }
 
     const filePath = path.join(dirPath, jsonFiles[0]);
