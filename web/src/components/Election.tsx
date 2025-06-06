@@ -24,11 +24,12 @@ const bigIntReplacer = (key: string, value: any) => {
 };
 const stringify = (value: any) => JSON.stringify(value, bigIntReplacer, 2);
 
+// Where we deployed our election program, on Solana Devnet.
 const ELECTION_PROGRAM_ADDRESS = address("9rHqnJtY6QGbyAdMjtzVaHKix5tAgbQTRpasW6iz2FZd");
 
 export function Election({ account }: Props) {
   const { current: NO_ERROR } = useRef(Symbol());
-  const [error, setError] = useState<unknown>(NO_ERROR);
+  const [error, setError] = useState<Error | undefined>(undefined);
   const { chain: currentChain } = useContext(ChainContext);
   const { connection } = useContext(ConnectionContext);
   const transactionSendingSigner = useWalletAccountTransactionSendingSigner(account, currentChain);
@@ -47,7 +48,8 @@ export function Election({ account }: Props) {
       console.log(`Address: ${ELECTION_PROGRAM_ADDRESS}`);
       setElections(results);
       console.log("Elections:", results);
-    } catch (error) {
+    } catch (thrownObject) {
+      const error = thrownObject as Error;
       console.error("Error fetching elections:", error);
       setError(error);
     }
@@ -81,7 +83,8 @@ export function Election({ account }: Props) {
       // Refresh the elections list
       const results = await getElections();
       setElections(results);
-    } catch (error) {
+    } catch (thrownObject) {
+      const error = thrownObject as Error;
       console.error("Error creating election:", error);
       setError(error);
     }
@@ -116,7 +119,8 @@ export function Election({ account }: Props) {
       // Refresh the elections list
       const results = await getElections();
       setElections(results);
-    } catch (error) {
+    } catch (thrownObject) {
+      const error = thrownObject as Error;
       console.error("Error voting:", error);
       setError(error);
     }
@@ -125,6 +129,17 @@ export function Election({ account }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <h3 style={{ margin: 0 }}>Elections</h3>
+      {error && (
+        <div style={{ 
+          padding: '12px', 
+          backgroundColor: '#fee2e2', 
+          border: '1px solid #ef4444',
+          borderRadius: '4px',
+          color: '#991b1b'
+        }}>
+          Error: {error.message}
+        </div>
+      )}
       <div style={{ display: 'flex', gap: '8px' }}>
         <button onClick={fetchElections}>{elections.length > 0 ? 'Update Election' : 'Get Election'}</button>
         {elections.length === 0 && <button onClick={createElection}>Create Election</button>}
