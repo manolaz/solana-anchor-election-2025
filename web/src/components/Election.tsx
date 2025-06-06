@@ -4,7 +4,7 @@ import {
 } from "@solana/kit";
 import { useWalletAccountTransactionSendingSigner } from "@solana/react";
 import { type UiWalletAccount } from "@wallet-standard/react";
-import { useContext, useRef, useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import * as programClient from "../../../dist/js-client";
 import { getElectionDecoder, ELECTION_DISCRIMINATOR } from "../../../dist/js-client";
 import { ChainContext } from "../context/ChainContext";
@@ -15,7 +15,10 @@ type Props = Readonly<{
   account: UiWalletAccount;
 }>;
 
+// Just for debugging
 const log = console.log;
+
+// Allow us to show objects with BigInts as JSON
 const bigIntReplacer = (key: string, value: any) => {
   if (typeof value === 'bigint') {
     return value.toString();
@@ -28,7 +31,6 @@ const stringify = (value: any) => JSON.stringify(value, bigIntReplacer, 2);
 const ELECTION_PROGRAM_ADDRESS = address("9rHqnJtY6QGbyAdMjtzVaHKix5tAgbQTRpasW6iz2FZd");
 
 export function Election({ account }: Props) {
-  const { current: NO_ERROR } = useRef(Symbol());
   const [error, setError] = useState<Error | undefined>(undefined);
   const { chain: currentChain } = useContext(ChainContext);
   const { connection } = useContext(ConnectionContext);
