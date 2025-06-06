@@ -1,12 +1,10 @@
 import {
   address,
-  lamports,
   type KeyPairSigner,
 } from "@solana/kit";
 import { useWalletAccountTransactionSendingSigner } from "@solana/react";
 import { type UiWalletAccount } from "@wallet-standard/react";
 import { useContext, useRef, useState, useEffect } from "react";
-import { useSWRConfig } from "swr";
 import * as programClient from "../../../dist/js-client";
 import { getElectionDecoder, ELECTION_DISCRIMINATOR } from "../../../dist/js-client";
 import { ChainContext } from "../context/ChainContext";
@@ -29,7 +27,6 @@ const stringify = (value: any) => JSON.stringify(value, bigIntReplacer, 2);
 const ELECTION_PROGRAM_ADDRESS = address("9rHqnJtY6QGbyAdMjtzVaHKix5tAgbQTRpasW6iz2FZd");
 
 export function Election({ account }: Props) {
-  const { mutate } = useSWRConfig();
   const { current: NO_ERROR } = useRef(Symbol());
   const [error, setError] = useState<unknown>(NO_ERROR);
   const { chain: currentChain } = useContext(ChainContext);
