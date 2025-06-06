@@ -12,9 +12,11 @@ type ConnectionContextProviderProps = {
 export function ConnectionContextProvider({ children }: ConnectionContextProviderProps) {
   const { solanaRpcSubscriptionsUrl, solanaRpcUrl } = useContext(ChainContext);
 
-  // Create the context value
+  // 'Create the context value' 
+  // ^ lol thanks that added a lot of value
   const contextValue: ConnectionContextType = useMemo(() => {
     return {
+      // Allow the Kite connection to be used by other components
       connection: connect(solanaRpcUrl, solanaRpcSubscriptionsUrl),
     };
   }, [solanaRpcSubscriptionsUrl, solanaRpcUrl]);

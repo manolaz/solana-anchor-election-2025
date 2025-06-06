@@ -1,14 +1,20 @@
+// Impot Kit and Codama client, the same as in our tests
 import {
   address,
   type KeyPairSigner,
 } from "@solana/kit";
-import { useWalletAccountTransactionSendingSigner } from "@solana/react";
-import { type UiWalletAccount } from "@wallet-standard/react";
-import { useContext, useState, useEffect } from "react";
 import * as programClient from "../../../dist/js-client";
 import { getElectionDecoder, ELECTION_DISCRIMINATOR } from "../../../dist/js-client";
+
+// We use this to Sign our transactions with the connected wallet
+import { useWalletAccountTransactionSendingSigner } from "@solana/react";
+
+// We use this to use our RPC and RPC subscriptions with the connected wallet
+import { type UiWalletAccount } from "@wallet-standard/react";
 import { ChainContext } from "../context/ChainContext";
 import { ConnectionContext } from "../context/ConnectionContext";
+
+import { useContext, useState, useEffect } from "react";
 import { DayNightChart } from "./DayNightChart";
 
 type Props = Readonly<{
@@ -16,6 +22,7 @@ type Props = Readonly<{
 }>;
 
 // Just for debugging
+// @ts-ignore you can delete this, but I'll re-add it whenever I want to log something.
 const log = console.log;
 
 // Allow us to show objects with BigInts as JSON
